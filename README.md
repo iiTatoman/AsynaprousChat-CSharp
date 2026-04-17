@@ -1,71 +1,62 @@
-# Asynaprous Chat — C# Port
+# Asynaprous Chat (C#)
 
-A C#/.NET port of the original asynchronous chat project.
+It has two parts:
 
-This repo includes:
-
-* a **web chat UI** served by ASP.NET Core
-* a **console peer client** for terminal-based testing
-
----
-
-## Project Structure
-
-```text
-AsynaprousChat-CSharp
-├─ ChatTrackerApi       # ASP.NET Core backend + browser UI
-├─ ChatPeerClient       # Console peer client
-└─ README.md
-```
-
----
+- `ChatTrackerApi`: ASP.NET Core backend + browser UI
+- `ChatPeerClient`: console client for socket/peer testing
 
 ## Requirements
 
-* **.NET 8 SDK**
-* A modern browser for the web UI
+- .NET 8 SDK
 
-Check your .NET version:
+Check it:
 
 ```bash
 dotnet --version
 ```
 
----
+## Folder layout
 
-## Quick Start
+```text
+AsynaprousChat-CSharp
+├─ ChatTrackerApi
+├─ ChatPeerClient
+└─ README.md
+```
 
-### Run the Web UI
+## Running the web app
+
+From the repo root:
 
 ```bash
 dotnet run --project ChatTrackerApi
 ```
 
-Open:
+Then open:
 
 ```text
 http://localhost:5000/chat.html
 ```
 
-### Demo Accounts
+Demo accounts:
 
-* `alice / alice123`
-* `user1 / password`
-* `admin / admin123`
+- `alice / alice123`
+- `user1 / password`
+- `admin / admin123`
 
-Open two browser windows or tabs and sign in with different accounts to test channel chat and direct messages.
+Open two browser tabs or windows and log into different accounts if you want to test chat between users.
 
----
+The app keeps login state per tab/window, so you do not need Incognito mode.
 
-## Console Client
+## Running the console clients
 
-Start the tracker API first:
+Start the API first:
 
 ```bash
 dotnet run --project ChatTrackerApi
 ```
 
-Then run two clients in separate terminals:
+Then in two separate terminals:
 
 ```bash
 dotnet run --project ChatPeerClient -- alice alice123 127.0.0.1 7001 http://localhost:5000 general
@@ -75,47 +66,42 @@ dotnet run --project ChatPeerClient -- alice alice123 127.0.0.1 7001 http://loca
 dotnet run --project ChatPeerClient -- user1 password 127.0.0.1 7002 http://localhost:5000 general
 ```
 
-### Client Arguments
+Argument order:
 
 ```text
-1. username
-2. password
-3. listenHost
-4. listenPort
-5. trackerBaseUrl
-6. channel (optional, default: general)
+username password listenHost listenPort trackerBaseUrl channel
 ```
 
-### Available Commands
+The last argument is optional. If you leave it out, it uses `general`.
 
-* `/help`
-* `/peers`
-* `/connect <peerId>`
-* `/join <channel>`
-* `/broadcast <message>`
-* `/dm <peerId> <message>`
-* `/history [channel]`
-* `/quit`
+Useful commands in the console client:
 
----
+```text
+/help
+/peers
+/connect <peerId>
+/join <channel>
+/broadcast <message>
+/dm <peerId> <message>
+/history [channel]
+/quit
+```
 
-## Running on Another Device
+## Running it from another device on the same network
 
-To access the web UI from another device on the same Wi-Fi/LAN, run:
+If you want to open the web UI from your phone or another laptop on the same Wi‑Fi, run the API like this:
 
 ```bash
 dotnet run --project ChatTrackerApi --urls "http://0.0.0.0:5000"
 ```
 
-Find your local IP address.
-
-### Windows
+Find your PC's local IP:
 
 ```bash
 ipconfig
 ```
 
-Then open this on another device:
+Then open this on the other device:
 
 ```text
 http://YOUR_PC_IP:5000/chat.html
@@ -127,87 +113,92 @@ Example:
 http://192.168.0.101:5000/chat.html
 ```
 
-> Do not use `localhost` on another device.
+Do not use `localhost` on another device. That points back to that device, not your PC.
 
----
+## Main endpoints
 
-## Main Endpoints
+```text
+POST /login
+GET  /whoami
+GET  /users
 
-### Auth / users
+POST /submit-info
+GET  /get-list
+POST /add-list
+POST /connect-peer
 
-* `POST /login`
-* `GET /whoami`
-* `GET /users`
-
-### Channels / peers
-
-* `POST /submit-info`
-* `GET /get-list`
-* `POST /add-list`
-* `POST /connect-peer`
-
-### Messaging
-
-* `POST /broadcast-peer`
-* `POST /send-peer`
-* `POST /web/send-dm`
-* `GET /web/dm-messages?user=alice`
-* `GET /messages?channel=general`
-
----
+POST /broadcast-peer
+POST /send-peer
+POST /web/send-dm
+GET  /web/dm-messages?user=alice
+GET  /messages?channel=general
+```
 
 ## Notes
 
-* The default channel is **`#general`**
-* New channels can be created from the web UI
-* The current version stores data **in memory**, so restarting the server resets users, channels, and messages
-* The web version uses the tracker API rather than raw browser peer-to-peer sockets
+This is a demo app, not a production chat server.
 
----
+A few things to know:
 
-## Troubleshooting
+- data is kept in memory
+- restarting the API clears users, channels, and messages
+- `#general` is the default channel
+- you can create extra channels from the web UI
+- the browser version goes through the tracker API
+
+## Common issues
 
 ### Port 5000 is already in use
 
-Find the process:
+Find what is using it:
 
 ```bash
 netstat -ano | findstr :5000
 ```
 
-Kill it by PID:
+Kill the process by PID:
 
 ```bash
 taskkill /PID <PID> /F
 ```
 
-Or run on another port:
+Or just run on another port:
 
 ```bash
 dotnet run --project ChatTrackerApi --urls "http://0.0.0.0:5001"
 ```
 
+Then open:
+
+```text
+http://localhost:5001/chat.html
+```
+
 ### Browser still shows the old UI
 
-Do a hard refresh:
+Hard refresh:
 
-* `Ctrl + F5`
+```text
+Ctrl + F5
+```
+
+If that still does not work, close the tab and open it again.
 
 ### Another device cannot connect
 
-Common causes:
+Usually one of these:
 
-* the server is only running on `localhost`
-* Windows Firewall is blocking the port
-* the device is not on the same network
+- the API is still running on `localhost` only
+- Windows Firewall blocked the port
+- the other device is not on the same network
+- you are using the wrong local IP
 
----
+## Quick smoke test
 
-## Suggested Demo Flow
-
-1. Start `ChatTrackerApi`
-2. Open `http://localhost:5000/chat.html` in two browser windows
-3. Log in as `alice` and `user1`
-4. Send a message in `#general`
-5. Test a direct message
-6. Create and join a new channel
+1. Run `ChatTrackerApi`
+2. Open `http://localhost:5000/chat.html`
+3. Log in as `alice`
+4. Open a second tab/window
+5. Log in as `user1`
+6. Send a message in `#general`
+7. Click a user and try a DM
