@@ -5,16 +5,6 @@ It has two parts:
 - `ChatTrackerApi`: ASP.NET Core backend + browser UI
 - `ChatPeerClient`: console client for socket/peer testing
 
-## Requirements
-
-- .NET 8 SDK
-
-Check it:
-
-```bash
-dotnet --version
-```
-
 ## Folder layout
 
 ```text
@@ -24,7 +14,7 @@ AsynaprousChat-CSharp
 └─ README.md
 ```
 
-## Running the web app
+## Run the web version
 
 From the repo root:
 
@@ -32,7 +22,7 @@ From the repo root:
 dotnet run --project ChatTrackerApi
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:5000/chat.html
@@ -44,11 +34,9 @@ Demo accounts:
 - `user1 / password`
 - `admin / admin123`
 
-Open two browser tabs or windows and log into different accounts if you want to test chat between users.
+Open two browser tabs or windows and sign into different accounts to test chat between users.
 
-The app keeps login state per tab/window, so you do not need Incognito mode.
-
-## Running the console clients
+## Run the console clients
 
 Start the API first:
 
@@ -72,9 +60,9 @@ Argument order:
 username password listenHost listenPort trackerBaseUrl channel
 ```
 
-The last argument is optional. If you leave it out, it uses `general`.
+The last argument is optional. If omitted, it uses `general`.
 
-Useful commands in the console client:
+Useful console commands:
 
 ```text
 /help
@@ -87,24 +75,18 @@ Useful commands in the console client:
 /quit
 ```
 
-## Running it from another device on the same network
+## Access from another device on the same network
 
-If you want to open the web UI from your phone or another laptop on the same Wi‑Fi, run the API like this:
+To expose the web UI to other devices on the same LAN, start the API with:
 
 ```bash
 dotnet run --project ChatTrackerApi --urls "http://0.0.0.0:5000"
 ```
 
-Find your PC's local IP:
-
-```bash
-ipconfig
-```
-
-Then open this on the other device:
+Then open:
 
 ```text
-http://YOUR_PC_IP:5000/chat.html
+http://<your-local-ip>:5000/chat.html
 ```
 
 Example:
@@ -113,7 +95,7 @@ Example:
 http://192.168.0.101:5000/chat.html
 ```
 
-Do not use `localhost` on another device. That points back to that device, not your PC.
+Make sure the other device is on the same network. `localhost` only works on the machine running the server.
 
 ## Main endpoints
 
@@ -146,44 +128,6 @@ A few things to know:
 - you can create extra channels from the web UI
 - the browser version goes through the tracker API
 
-## Common issues
-
-### Port 5000 is already in use
-
-Find what is using it:
-
-```bash
-netstat -ano | findstr :5000
-```
-
-Kill the process by PID:
-
-```bash
-taskkill /PID <PID> /F
-```
-
-Or just run on another port:
-
-```bash
-dotnet run --project ChatTrackerApi --urls "http://0.0.0.0:5001"
-```
-
-Then open:
-
-```text
-http://localhost:5001/chat.html
-```
-
-### Browser still shows the old UI
-
-Hard refresh:
-
-```text
-Ctrl + F5
-```
-
-If that still does not work, close the tab and open it again.
-
 ### Another device cannot connect
 
 Usually one of these:
@@ -191,14 +135,4 @@ Usually one of these:
 - the API is still running on `localhost` only
 - Windows Firewall blocked the port
 - the other device is not on the same network
-- you are using the wrong local IP
-
-## Quick smoke test
-
-1. Run `ChatTrackerApi`
-2. Open `http://localhost:5000/chat.html`
-3. Log in as `alice`
-4. Open a second tab/window
-5. Log in as `user1`
-6. Send a message in `#general`
-7. Click a user and try a DM
+- you are using the wrong local I.
