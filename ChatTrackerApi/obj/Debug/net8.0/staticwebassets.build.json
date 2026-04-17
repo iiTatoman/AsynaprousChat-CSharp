@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "Hash": "urvPHfjQFWMnB8suDyUlyoWEv1IuzUVKyJ4KEytDpfE=",
+  "Source": "ChatTrackerApi",
+  "BasePath": "_content/ChatTrackerApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "ChatTrackerApi\\wwwroot",
+      "Source": "ChatTrackerApi",
+      "ContentRoot": "C:\\Users\\DELL\\Downloads\\AsynaprousChat-CSharp-webui-bubbles-noextra\\ChatTrackerApi\\wwwroot\\",
+      "BasePath": "_content/ChatTrackerApi",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\DELL\\Downloads\\AsynaprousChat-CSharp-webui-bubbles-noextra\\ChatTrackerApi\\wwwroot\\chat.html",
+      "SourceId": "ChatTrackerApi",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\DELL\\Downloads\\AsynaprousChat-CSharp-webui-bubbles-noextra\\ChatTrackerApi\\wwwroot\\",
+      "BasePath": "_content/ChatTrackerApi",
+      "RelativePath": "chat.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\chat.html"
+    },
+    {
+      "Identity": "C:\\Users\\DELL\\Downloads\\AsynaprousChat-CSharp-webui-bubbles-noextra\\ChatTrackerApi\\wwwroot\\index.html",
+      "SourceId": "ChatTrackerApi",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\DELL\\Downloads\\AsynaprousChat-CSharp-webui-bubbles-noextra\\ChatTrackerApi\\wwwroot\\",
+      "BasePath": "_content/ChatTrackerApi",
+      "RelativePath": "index.html",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\index.html"
+    }
+  ]
+}

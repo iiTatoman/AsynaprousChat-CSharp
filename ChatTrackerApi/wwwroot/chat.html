@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asynaprous Chat</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --panel-3: #0b1220;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --accent-2: #3b82f6;
+      --danger: #ef4444;
+      --border: rgba(148, 163, 184, 0.18);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Segoe UI, Arial, sans-serif;
+      background: linear-gradient(160deg, #020617 0%, #111827 50%, #0b1220 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .hidden { display: none !important; }
+
+    .shell {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    .login-card {
+      max-width: 420px;
+      margin: 8vh auto 0;
+      background: rgba(17, 24, 39, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.35);
+    }
+
+    .title {
+      margin: 0 0 8px;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .subtitle {
+      margin: 0 0 22px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 10px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #cbd5e1;
+    }
+
+    input, button {
+      font: inherit;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text);
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    input:focus {
+      border-color: rgba(59,130,246,0.8);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: white;
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    button.secondary {
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    button.danger {
+      background: linear-gradient(135deg, #dc2626, #f97316);
+    }
+
+    .status {
+      margin-top: 12px;
+      min-height: 22px;
+      color: #bfdbfe;
+      font-size: 14px;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 12px;
+      height: calc(100vh - 24px);
+    }
+
+    .sidebar, .main {
+      background: rgba(17, 24, 39, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.25);
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-header, .main-header {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.45);
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .userline {
+      color: var(--muted);
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .section {
+      padding: 16px 18px;
+      border-bottom: 1px solid rgba(148,163,184,0.08);
+    }
+
+    .section h3 {
+      margin: 0 0 12px;
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .item-list {
+      display: grid;
+      gap: 8px;
+      max-height: 230px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: 0.15s ease;
+      color: #dbeafe;
+    }
+
+    .item:hover { border-color: rgba(59,130,246,0.5); }
+    .item.active {
+      border-color: rgba(34,197,94,0.65);
+      background: rgba(34,197,94,0.12);
+      color: #dcfce7;
+    }
+
+    .small-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-width: 0;
+    }
+
+    .main-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .chat-title {
+      font-weight: 800;
+      font-size: 22px;
+      margin: 0;
+    }
+
+    .chat-subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .messages {
+      padding: 18px;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+      background:
+        radial-gradient(circle at top right, rgba(59,130,246,0.08), transparent 30%),
+        linear-gradient(180deg, rgba(2,6,23,0.3), rgba(2,6,23,0.1));
+    }
+
+    .message-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-width: 70%;
+    }
+
+    .message-row.self {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .message-row.other {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .message-meta {
+      font-size: 12px;
+      color: var(--muted);
+      padding: 0 4px;
+    }
+
+    .message {
+      width: fit-content;
+      max-width: 100%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .message.self {
+      background: rgba(34, 197, 94, 0.14);
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+
+    .composer {
+      padding: 16px 18px 18px;
+      border-top: 1px solid var(--border);
+      background: rgba(2, 6, 23, 0.45);
+    }
+
+    .composer-grid {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 48px;
+      max-height: 120px;
+      resize: vertical;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text);
+      outline: none;
+      font: inherit;
+    }
+
+    textarea:focus {
+      border-color: rgba(34,197,94,0.8);
+      box-shadow: 0 0 0 3px rgba(34,197,94,0.12);
+    }
+
+    .empty {
+      color: var(--muted);
+      font-size: 14px;
+      padding: 18px;
+      text-align: center;
+      border: 1px dashed rgba(148,163,184,0.18);
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    @media (max-width: 980px) {
+      .shell { padding: 14px; }
+      .app { grid-template-columns: 1fr; height: auto; min-height: calc(100vh - 28px); }
+      .sidebar { order: 2; }
+      .main { order: 1; min-height: 70vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section id="loginView" class="login-card">
+      <h1 class="title">Asynaprous Chat</h1>
+      <p class="subtitle">Browser version of the C# chat demo. Login first, then chat in channels or send direct messages. This version stores login per tab/window so you can open two normal browser windows as different users.</p>
+
+      <label for="username">Username</label>
+      <input id="username" placeholder="alice" autocomplete="username" />
+
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="alice123" autocomplete="current-password" />
+
+      <button id="loginBtn">Login</button>
+      <div class="status" id="loginStatus"></div>
+      <div class="hint">Demo accounts: <strong>alice / alice123</strong>, <strong>user1 / password</strong>, <strong>admin / admin123</strong>. Open two normal browser windows/tabs and sign in as different users.</div>
+    </section>
+
+    <section id="appView" class="app hidden">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="brand">Asynaprous Chat</div>
+          <div class="userline">
+            <span>Signed in as <strong id="currentUser">-</strong></span>
+            <button id="logoutBtn" class="secondary">Logout</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Channels</h3>
+          <div id="channelList" class="item-list"></div>
+          <div class="small-row" style="margin-top: 10px;">
+            <input id="newChannel" placeholder="new channel" style="margin:0;" />
+            <button id="joinChannelBtn" class="secondary">Join</button>
+          </div>
+        </div>
+
+        <div class="section" style="flex:1; min-height: 0;">
+          <h3>Users</h3>
+          <div id="userList" class="item-list"></div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="main-header">
+          <div>
+            <h2 class="chat-title" id="chatTitle">#general</h2>
+            <div class="chat-subtitle" id="chatSubtitle">Tracker-backed browser chat</div>
+          </div>
+          <div class="toolbar">
+            <button id="channelModeBtn" class="secondary hidden">Back to channel</button>
+            <button id="reloadBtn" class="secondary">Reload</button>
+          </div>
+        </div>
+
+        <div id="messages" class="messages">
+          <div class="empty">No messages yet. Say hi 👋</div>
+        </div>
+
+        <div class="composer">
+          <div class="composer-grid">
+            <textarea id="messageInput" placeholder="Type your message..."></textarea>
+            <button id="sendBtn">Send</button>
+          </div>
+        </div>
+      </main>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      username: null,
+      mode: 'channel',
+      currentChannel: 'general',
+      currentDmUser: null,
+      channels: ['general'],
+      users: [],
+      pollHandle: null,
+    };
+
+    const loginView = document.getElementById('loginView');
+    const appView = document.getElementById('appView');
+    const loginStatus = document.getElementById('loginStatus');
+    const currentUserEl = document.getElementById('currentUser');
+    const channelListEl = document.getElementById('channelList');
+    const userListEl = document.getElementById('userList');
+    const chatTitleEl = document.getElementById('chatTitle');
+    const chatSubtitleEl = document.getElementById('chatSubtitle');
+    const messagesEl = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const channelModeBtn = document.getElementById('channelModeBtn');
+
+    function getStoredAuth() {
+      const username = sessionStorage.getItem('chat_username');
+      const password = sessionStorage.getItem('chat_password');
+      if (!username || !password) {
+        return null;
+      }
+      return { username, password };
+    }
+
+    function setStoredAuth(username, password) {
+      sessionStorage.setItem('chat_username', username);
+      sessionStorage.setItem('chat_password', password);
+    }
+
+    function clearStoredAuth() {
+      sessionStorage.removeItem('chat_username');
+      sessionStorage.removeItem('chat_password');
+    }
+
+    async function api(path, options = {}) {
+      const auth = getStoredAuth();
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      };
+
+      if (auth) {
+        headers['Authorization'] = `Basic ${btoa(`${auth.username}:${auth.password}`)}`;
+      }
+
+      const response = await fetch(path, {
+        headers,
+        ...options,
+      });
+
+      const text = await response.text();
+      let payload = null;
+      try { payload = text ? JSON.parse(text) : null; } catch {}
+
+      if (!response.ok || payload?.status === 'error') {
+        throw new Error(payload?.message || `Request failed: ${response.status}`);
+      }
+
+      return payload?.data ?? payload;
+    }
+
+    function setStatus(text, isError = false) {
+      loginStatus.textContent = text || '';
+      loginStatus.style.color = isError ? '#fca5a5' : '#bfdbfe';
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function renderChannels() {
+      channelListEl.innerHTML = '';
+      for (const channel of state.channels) {
+        const button = document.createElement('button');
+        button.className = `item ${state.mode === 'channel' && state.currentChannel === channel ? 'active' : ''}`;
+        button.textContent = `#${channel}`;
+        button.onclick = async () => {
+          state.mode = 'channel';
+          state.currentChannel = channel;
+          state.currentDmUser = null;
+          await joinChannel(channel);
+          renderAll();
+          await loadMessages();
+        };
+        channelListEl.appendChild(button);
+      }
+    }
+
+    function renderUsers() {
+      userListEl.innerHTML = '';
+      const filtered = state.users.filter(user => user.toLowerCase() !== (state.username || '').toLowerCase());
+      if (!filtered.length) {
+        const div = document.createElement('div');
+        div.className = 'empty';
+        div.textContent = 'No other users found yet.';
+        userListEl.appendChild(div);
+        return;
+      }
+
+      for (const user of filtered) {
+        const button = document.createElement('button');
+        button.className = `item ${state.mode === 'dm' && state.currentDmUser === user ? 'active' : ''}`;
+        button.textContent = user;
+        button.onclick = async () => {
+          state.mode = 'dm';
+          state.currentDmUser = user;
+          renderAll();
+          await loadMessages();
+        };
+        userListEl.appendChild(button);
+      }
+    }
+
+    function renderHeader() {
+      if (state.mode === 'dm' && state.currentDmUser) {
+        chatTitleEl.textContent = `DM · ${state.currentDmUser}`;
+        chatSubtitleEl.textContent = 'Private tracker-backed direct messages';
+        channelModeBtn.classList.remove('hidden');
+      } else {
+        chatTitleEl.textContent = `#${state.currentChannel}`;
+        chatSubtitleEl.textContent = 'Channel chat via the tracker API';
+        channelModeBtn.classList.add('hidden');
+      }
+    }
+
+    function renderMessages(messages) {
+      if (!messages.length) {
+        messagesEl.innerHTML = '<div class="empty">No messages yet. Say hi 👋</div>';
+        return;
+      }
+
+      messagesEl.innerHTML = messages.map(msg => {
+        const self = msg.from?.toLowerCase() === state.username?.toLowerCase();
+        return `
+          <div class="message-row ${self ? 'self' : 'other'}">
+            <div class="message-meta">${escapeHtml(msg.from || 'unknown')} · ${escapeHtml(msg.ts || '')}</div>
+            <div class="message ${self ? 'self' : ''}">${escapeHtml(msg.text || '')}</div>
+          </div>
+        `;
+      }).join('');
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function renderAll() {
+      currentUserEl.textContent = state.username || '-';
+      renderChannels();
+      renderUsers();
+      renderHeader();
+    }
+
+    async function login() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+      if (!username || !password) {
+        setStatus('Please enter username and password.', true);
+        return;
+      }
+
+      try {
+        setStatus('Logging in...');
+        const data = await api('/login', {
+          method: 'POST',
+          body: JSON.stringify({ username, password }),
+        });
+        setStoredAuth(username, password);
+        state.username = data.username;
+        loginView.classList.add('hidden');
+        appView.classList.remove('hidden');
+        await joinChannel(state.currentChannel);
+        await refreshSidebar();
+        renderAll();
+        await loadMessages();
+        startPolling();
+      } catch (error) {
+        setStatus(error.message, true);
+      }
+    }
+
+    async function restoreSession() {
+      const auth = getStoredAuth();
+      if (!auth) {
+        return;
+      }
+
+      try {
+        document.getElementById('username').value = auth.username;
+        document.getElementById('password').value = auth.password;
+        const data = await api('/whoami');
+        state.username = data.username;
+        loginView.classList.add('hidden');
+        appView.classList.remove('hidden');
+        await joinChannel(state.currentChannel);
+        await refreshSidebar();
+        renderAll();
+        await loadMessages();
+        startPolling();
+      } catch {
+        clearStoredAuth();
+      }
+    }
+
+    async function joinChannel(channel) {
+      await api('/add-list', {
+        method: 'POST',
+        body: JSON.stringify({ channel, peerId: `web:${state.username}` }),
+      });
+      if (!state.channels.includes(channel)) {
+        state.channels.push(channel);
+        state.channels.sort((a, b) => a.localeCompare(b));
+      }
+    }
+
+    async function refreshSidebar() {
+      const [listData, usersData] = await Promise.all([
+        api('/get-list'),
+        api('/users'),
+      ]);
+
+      const channelsFromServer = Object.keys(listData.channels || {});
+      state.channels = Array.from(new Set([...state.channels, ...channelsFromServer])).sort((a, b) => a.localeCompare(b));
+      state.users = usersData.users || [];
+      renderAll();
+    }
+
+    async function loadMessages() {
+      try {
+        let data;
+        if (state.mode === 'dm' && state.currentDmUser) {
+          data = await api(`/web/dm-messages?user=${encodeURIComponent(state.currentDmUser)}`);
+        } else {
+          data = await api(`/messages?channel=${encodeURIComponent(state.currentChannel)}`);
+        }
+        renderMessages(data.messages || []);
+      } catch (error) {
+        messagesEl.innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    async function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text) return;
+
+      try {
+        if (state.mode === 'dm' && state.currentDmUser) {
+          await api('/web/send-dm', {
+            method: 'POST',
+            body: JSON.stringify({ to: state.currentDmUser, text }),
+          });
+        } else {
+          await api('/broadcast-peer', {
+            method: 'POST',
+            body: JSON.stringify({ channel: state.currentChannel, text, peerId: `web:${state.username}` }),
+          });
+        }
+        messageInput.value = '';
+        await refreshSidebar();
+        await loadMessages();
+      } catch (error) {
+        alert(error.message);
+      }
+    }
+
+    function startPolling() {
+      stopPolling();
+      state.pollHandle = setInterval(async () => {
+        try {
+          await refreshSidebar();
+          await loadMessages();
+        } catch {}
+      }, 2000);
+    }
+
+    function stopPolling() {
+      if (state.pollHandle) {
+        clearInterval(state.pollHandle);
+        state.pollHandle = null;
+      }
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', login);
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      stopPolling();
+      clearStoredAuth();
+      state.username = null;
+      state.mode = 'channel';
+      state.currentChannel = 'general';
+      state.currentDmUser = null;
+      state.users = [];
+      loginView.classList.remove('hidden');
+      appView.classList.add('hidden');
+      setStatus('Logged out. You can sign in as another user in this window.');
+    });
+    document.getElementById('reloadBtn').addEventListener('click', async () => {
+      await refreshSidebar();
+      await loadMessages();
+    });
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('joinChannelBtn').addEventListener('click', async () => {
+      const channel = document.getElementById('newChannel').value.trim();
+      if (!channel) return;
+      document.getElementById('newChannel').value = '';
+      state.mode = 'channel';
+      state.currentChannel = channel;
+      state.currentDmUser = null;
+      await joinChannel(channel);
+      renderAll();
+      await loadMessages();
+    });
+    channelModeBtn.addEventListener('click', async () => {
+      state.mode = 'channel';
+      state.currentDmUser = null;
+      renderAll();
+      await loadMessages();
+    });
+    messageInput.addEventListener('keydown', async (event) => {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        await sendMessage();
+      }
+    });
+
+    restoreSession();
+  </script>
+</body>
+</html>
